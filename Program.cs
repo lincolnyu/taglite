@@ -18,10 +18,10 @@ if (args.Length == 1 && args[0] == "-h")
 
 var inputRootDir = args[0];
 
-if (args.Length == 2 && args[1].ToLower() == "list")
+if (args.Length == 2 && args[1].ToLower() == "all")
 {
     var tagRepo = GetTagRepo(inputRootDir);
-    Console.Write("All tags:");
+    Console.WriteLine("All tags:");
     foreach (var tag in tagRepo.TagMapping.Keys.Order())
     {
         Console.Write(" ");
@@ -43,7 +43,7 @@ var outputDir = args[3];
 
 if (!Directory.Exists(inputRootDir))
 {
-    Console.WriteLine($"input-root-dir '{inputRootDir}' does not exist");
+    Console.WriteLine($"<input-root-dir> '{inputRootDir}' does not exist");
     PrintUsage();
     return;
 }
@@ -52,7 +52,7 @@ if (!Directory.Exists(outputDir))
     Directory.CreateDirectory(outputDir);
     if (!Directory.Exists(outputDir))
     {
-        Console.WriteLine($"output-dir '{outputDir}' does not exist and cannot be created");
+        Console.WriteLine($"<output-dir> '{outputDir}' does not exist and cannot be created");
         PrintUsage();
         return;
     }
@@ -110,7 +110,7 @@ void PrintUsage()
     Console.WriteLine(" tag-list-string: Tags separate by commas.");
     Console.WriteLine(" any|all: Whether to find the directories that contain any or all of the tags in the list.");
     Console.WriteLine(" output-dir: The directory where the shortcuts to all the found directories are put.");
-    Console.WriteLine("Usage 2: <input-root-dir> list");
-    Console.WriteLine(" To display all tags.");
-    Console.WriteLine("-h: To show this help.");
+    Console.WriteLine("Usage 2: <input-root-dir> all");
+    Console.WriteLine(" To list all tags in alphabetic order.");
+    Console.WriteLine("Show this help: -h");
 }
