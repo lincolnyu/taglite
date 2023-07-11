@@ -64,7 +64,7 @@ namespace Taglite
                     }
                 }
             }
-            return theSet?? new HashSet<TagNode>{};
+            return theSet?? new HashSet<TagNode>();
         }
     }
 }
