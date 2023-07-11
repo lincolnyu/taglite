@@ -114,13 +114,19 @@ foreach (var node in nodes)
     var dir = new DirectoryInfo(node.Directory);
     if (expandFiles)
     {
-        foreach (var f in dir.GetFiles())
+        var dirName = dir.Name;
+        var prefix = clashResolver.New(dirName);
+        foreach (var item in node.EnumerateContents())
         {
-            if (!f.Name.Equals(TagNode.TagliteFileName, StringComparison.OrdinalIgnoreCase))
+            var rel = Util.GetRelative(item.FullName, dir.FullName);
+            var target = Path.Combine(viewDir, prefix + "-" + rel);
+            if (item is FileInfo fileInfo)
             {
-                var initialName = dir.Name + "-" + f.Name;
-                var name = clashResolver.New(initialName);
-                System.Diagnostics.Process.Start("cmd.exe", "/c mklink \"" + Path.Combine(viewDir, name) + "\" \"" + f.FullName + "\"");
+                System.Diagnostics.Process.Start("cmd.exe", "/c mklink \"" + target + "\" \"" + fileInfo.FullName + "\"");
+            }
+            else if (item is DirectoryInfo dirInfo)
+            {
+                Directory.CreateDirectory(target);
             }
         }
     }

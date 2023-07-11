@@ -22,6 +22,12 @@ namespace Taglite
         }
         private HashSet<string>? _tags;
 
+        public static bool IsTaggedDirectory(string directory)
+        {
+            var tagFile = Path.Combine(directory, TagNode.TagliteFileName);
+            return File.Exists(tagFile);
+        }
+
         public static IEnumerable<string> LoadTagsFromTagFile(string tagFile)
         {
             using var sr = new StreamReader(tagFile);
@@ -51,6 +57,41 @@ namespace Taglite
         public override int GetHashCode()
         {
             return Directory.GetHashCode();
+        }
+
+        public IEnumerable<FileSystemInfo> EnumerateContents()
+        {
+            var startingDir = new DirectoryInfo(Directory);
+            foreach (var file in startingDir.GetFiles().Where(x=>!x.Name.Equals(TagliteFileName)))
+            {
+                yield return file;
+            }
+            foreach (var dir in startingDir.GetDirectories())
+            {
+                foreach (var item in EnumerateContentsRecursiveUntilTagged(dir))
+                {
+                    yield return item;
+                }
+            }
+        }
+
+        private static IEnumerable<FileSystemInfo> EnumerateContentsRecursiveUntilTagged(DirectoryInfo startingDir)
+        {
+            if (IsTaggedDirectory(startingDir.FullName))
+            {
+                yield break;
+            }
+            foreach (var file in startingDir.GetFiles())
+            {
+                yield return file;
+            }
+            foreach (var dir in startingDir.GetDirectories())
+            {
+                foreach (var item in EnumerateContentsRecursiveUntilTagged(dir))
+                {
+                    yield return item;
+                }
+            }
         }
     }
 }
