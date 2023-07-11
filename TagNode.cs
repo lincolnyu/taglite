@@ -2,6 +2,7 @@ namespace Taglite
 {
     class TagNode
     {
+        public const string TagliteFileName = ".taglite";
         public TagNode(string directory)
         {
             Directory = directory;
@@ -13,7 +14,7 @@ namespace Taglite
             {
                 if (_tags == null)
                 {
-                    var tagFile = Path.Combine(Directory, ".taglite");
+                    var tagFile = Path.Combine(Directory, TagliteFileName);
                     _tags = new HashSet<string>(LoadTagsFromTagFile(tagFile));
                 }
                 return _tags;

@@ -65,11 +65,19 @@ if (!Directory.Exists(viewDir))
 }
 
 HashSet<TagNode> nodes;
+bool expandFiles = false;
 {
     var tagRepo = GetTagRepo(storeDir);
     var tagListString = TryGetArg(1);
     var tags = tagListString?.Split(',', StringSplitOptions.RemoveEmptyEntries|StringSplitOptions.TrimEntries).Select(x=>x.ToLower());
-    switch (cmd)
+    if (cmd.Length < 3)
+    {
+        Console.WriteLine("Unexpected commnnand");
+        PrintUsage();
+        return;
+    }
+    var anyOrAll = cmd.Substring(0,3);
+    switch (anyOrAll)
     {
         case "any":
             if (tags != null)
@@ -93,22 +101,41 @@ HashSet<TagNode> nodes;
             }
             break;
         default:
+            Console.WriteLine("Unexpected commnnand");
             PrintUsage();
             return;
     }
+    expandFiles = (cmd.Length == 4 && cmd[3] == 'f');
 }
 
+var clashResolver = new NameClashResolver();
 foreach (var node in nodes)
 {
     var dir = new DirectoryInfo(node.Directory);
-    // TODO protect against long file name
-    var sb = new StringBuilder(dir.Name);
-    foreach (var tag in node.Tags.Order())
+    if (expandFiles)
     {
-        sb.Append(".");
-        sb.Append(tag);
+        foreach (var f in dir.GetFiles())
+        {
+            if (!f.Name.Equals(TagNode.TagliteFileName, StringComparison.OrdinalIgnoreCase))
+            {
+                var initialName = dir.Name + "-" + f.Name;
+                var name = clashResolver.New(initialName);
+                System.Diagnostics.Process.Start("cmd.exe", "/c mklink \"" + Path.Combine(viewDir, name) + "\" \"" + f.FullName + "\"");
+            }
+        }
     }
-    System.Diagnostics.Process.Start("cmd.exe", "/c mklink /d \"" + Path.Combine(viewDir, sb.ToString()) + "\" \"" + node.Directory + "\"");
+    else
+    {
+        // TODO protect against long file name
+        var sb = new StringBuilder(dir.Name);
+        foreach (var tag in node.Tags.Order())
+        {
+            sb.Append(".");
+            sb.Append(tag);
+        }
+        var name = clashResolver.New(sb.ToString());
+        System.Diagnostics.Process.Start("cmd.exe", "/c mklink /d \"" + Path.Combine(viewDir, name) + "\" \"" + node.Directory + "\"");
+    }
 }
 
 TagRepo GetTagRepo(string dir)
@@ -143,12 +170,33 @@ string? TryGetArg(int index, string? defaultStr=null)=>args.Length > index? args
 
 void PrintUsage()
 {
-    Console.WriteLine("Usage 1: any|all [<tag-list-string>] [<view-dir>] [<store-dir>]");
+    Console.WriteLine("Usage 1: (any|all)(f|) [<tag-list-string>] [<view-dir>] [<store-dir>]");
     Console.WriteLine(" any|all: Whether to find the directories that contain any or all of the tags in the list.");
+    Console.WriteLine(" f: Create file symlinks instead.");
     Console.WriteLine(" <tag-list-string>: Tags separate by commas. Optional only if 'any' is chosen.");
     Console.WriteLine(" <view-dir>: The directory where the shortcuts to all the found directories are put.");
     Console.WriteLine(" <store-dir>: The directory contains all the subdirectories to search for the tags from.");
     Console.WriteLine("Usage 2: alltags [<store-dir>]");
     Console.WriteLine(" To list all the tags from <store-dir> in alphabetic order.");
     Console.WriteLine("To show this help: -h");
+}
+
+class NameClashResolver
+{
+    private HashSet<string> _usedNames = new HashSet<string>();
+    internal string New(string input)
+    {
+        int dupSuffix = 0;
+        var attempt = input;
+        // TODO can be optimized
+        while (true)
+        {
+            if (!_usedNames.Contains(attempt))
+            {
+                _usedNames.Add(attempt);
+                return attempt;
+            }
+            attempt = input + $"({++dupSuffix})";
+        }
+    }
 }

@@ -20,7 +20,7 @@ namespace Taglite
 
         public void AddDirectoryIfTagged(string directory)
         {
-            var tagFile = Path.Combine(directory, ".taglite");
+            var tagFile = Path.Combine(directory, TagNode.TagliteFileName);
             if (File.Exists(tagFile))
             {
                 AddNode(new TagNode(directory));
