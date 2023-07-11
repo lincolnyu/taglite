@@ -27,19 +27,15 @@ namespace Taglite
             }
         }
 
-        public HashSet<TagNode> FindAllNodesContainingAny(IEnumerable<string> tags)
-        {
-            var theSet = new HashSet<TagNode>();
-            foreach (var tag in tags)
+        public HashSet<TagNode> FindAllNodesContainingAtLeastOne(IEnumerable<string> tags)
+            => tags.Aggregate(new HashSet<TagNode>(), (theSet, tag)=>
             {
-                if (!TagMapping.TryGetValue(tag, out var dirs))
+                if (TagMapping.TryGetValue(tag, out var dirs))
                 {
-                    continue;
+                    theSet.UnionWith(dirs);
                 }
-                theSet.UnionWith(dirs);
-            }
-            return theSet;
-        }
+                return theSet;
+            });
 
         public HashSet<TagNode> FindAllNodesContainingAll(IEnumerable<string> tags)
         {
