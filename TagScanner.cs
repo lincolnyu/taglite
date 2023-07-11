@@ -19,32 +19,10 @@ namespace Taglite
             {
                 dirName += Path.DirectorySeparatorChar;
             }
-            var tagFile = Path.Combine(dirName, ".taglite");
-            if (File.Exists(tagFile))
-            {
-                AddTagFileTo(dirName, tagFile, tagRepo);
-            }
+            tagRepo.AddDirectoryIfTagged(dirName);
             foreach (var dir in directory.GetDirectories())
             {
                 ScanAndAddTo(dir, tagRepo);
-            }
-        }
-
-        private void AddTagFileTo(string directory, string tagFile, TagRepo tagRepo)
-        {
-            using var sr = new StreamReader(tagFile);
-            
-            while (!sr.EndOfStream)
-            {
-                var line = sr.ReadLine();
-                var tag = line?.Trim()?.ToLower();
-                if (string.IsNullOrEmpty(tag)) continue;
-                if (!tagRepo.TagMapping.TryGetValue(tag, out var allDirsContainingTag))
-                {
-                    allDirsContainingTag = new HashSet<string>();
-                    tagRepo.TagMapping[tag] = allDirsContainingTag;
-                }
-                allDirsContainingTag.Add(directory);
             }
         }
 

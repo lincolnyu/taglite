@@ -3,11 +3,33 @@ namespace Taglite
     class TagRepo
     {
         // Tag to all containing directories
-        public readonly Dictionary<string, HashSet<string>> TagMapping = new Dictionary<string, HashSet<string>>();
+        public readonly Dictionary<string, HashSet<TagNode>> TagMapping = new Dictionary<string, HashSet<TagNode>>();
 
-        public HashSet<string> FindAllDirectoreisContainingAny(IEnumerable<string> tags)
+        public void AddNode(TagNode node)
         {
-            var theSet = new HashSet<string>();
+            foreach(var tag in node.Tags)
+            {
+                if (!TagMapping.TryGetValue(tag, out var taggedNodes))
+                {
+                    taggedNodes = new HashSet<TagNode>();
+                    TagMapping[tag] = taggedNodes;
+                }
+                taggedNodes.Add(node);
+            }
+        }
+
+        public void AddDirectoryIfTagged(string directory)
+        {
+            var tagFile = Path.Combine(directory, ".taglite");
+            if (File.Exists(tagFile))
+            {
+                AddNode(new TagNode(directory));
+            }
+        }
+
+        public HashSet<TagNode> FindAllNodesContainingAny(IEnumerable<string> tags)
+        {
+            var theSet = new HashSet<TagNode>();
             foreach (var tag in tags)
             {
                 if (!TagMapping.TryGetValue(tag, out var dirs))
@@ -19,9 +41,9 @@ namespace Taglite
             return theSet;
         }
 
-        public HashSet<string> FindAllDirectoriesContainingAll(IEnumerable<string> tags)
+        public HashSet<TagNode> FindAllNodesContainingAll(IEnumerable<string> tags)
         {
-            HashSet<string>? theSet = null;
+            HashSet<TagNode>? theSet = null;
             foreach (var tag in tags)
             {
                 if (!TagMapping.TryGetValue(tag, out var dirs))
@@ -31,7 +53,7 @@ namespace Taglite
                 }
                 if (theSet == null)
                 {
-                    theSet = new HashSet<string>(dirs);
+                    theSet = new HashSet<TagNode>(dirs);
                 }
                 else
                 {
@@ -42,7 +64,7 @@ namespace Taglite
                     }
                 }
             }
-            return theSet?? new HashSet<string>{};
+            return theSet?? new HashSet<TagNode>{};
         }
     }
 }

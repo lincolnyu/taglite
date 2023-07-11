@@ -1,7 +1,34 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 
+using System.Text;
 using Taglite;
+
+if (args.Length < 1)
+{
+    PrintUsage();
+    return;
+}
+
+if (args.Length == 1 && args[0] == "-h")
+{
+    PrintUsage();
+    return;
+}
+
+var inputRootDir = args[0];
+
+if (args.Length == 2 && args[1].ToLower() == "list")
+{
+    var tagRepo = GetTagRepo(inputRootDir);
+    Console.Write("All tags:");
+    foreach (var tag in tagRepo.TagMapping.Keys.Order())
+    {
+        Console.Write(" ");
+        Console.Write(tag);
+    }
+    return;
+}
 
 if (args.Length != 4)
 {
@@ -9,7 +36,7 @@ if (args.Length != 4)
     return;
 }
 
-var inputRootDir = args[0];
+
 var tagListString = args[1];
 var anyOrAll = args[2].ToLower();
 var outputDir = args[3];
@@ -43,30 +70,47 @@ switch (anyOrAll)
 
 var tags = tagListString.Split(',', StringSplitOptions.RemoveEmptyEntries|StringSplitOptions.TrimEntries).Select(x=>x.ToLower());
 
-var tagScanner = new TagScanner(inputRootDir);
-var tagRepo = tagScanner.Scan();
-HashSet<string> dirs;
-if (isAll)
+HashSet<TagNode> nodes;
 {
-    dirs = tagRepo.FindAllDirectoriesContainingAll(tags);
-}
-else
-{
-    dirs = tagRepo.FindAllDirectoreisContainingAny(tags);
+    var tagRepo = GetTagRepo(inputRootDir);
+    if (isAll)
+    {
+        nodes = tagRepo.FindAllNodesContainingAll(tags);
+    }
+    else
+    {
+        nodes = tagRepo.FindAllNodesContainingAny(tags);
+    }
 }
 
-foreach (var dirStr in dirs)
+foreach (var node in nodes)
 {
-    var dir = new DirectoryInfo(dirStr);
-    var dirName = dir.Name;
-    System.Diagnostics.Process.Start("cmd.exe", "/c mklink /d \"" + Path.Combine(outputDir, dirName) + "\" \"" + dirStr + "\"");
+    var dir = new DirectoryInfo(node.Directory);
+    // TODO protect against long file name
+    var sb = new StringBuilder(dir.Name);
+    foreach (var tag in node.Tags.Order())
+    {
+        sb.Append(".");
+        sb.Append(tag);
+    }
+    System.Diagnostics.Process.Start("cmd.exe", "/c mklink /d \"" + Path.Combine(outputDir, sb.ToString()) + "\" \"" + node.Directory + "\"");
+}
+
+TagRepo GetTagRepo(string dir)
+{
+    var tagScanner = new TagScanner(dir);
+    var tagRepo = tagScanner.Scan();
+    return tagRepo;
 }
 
 void PrintUsage()
 {
-    Console.WriteLine("<input-root-dir> <tag-list-string> <any|all> <output-dir>");
-    Console.WriteLine(" input-root-dir: the directory contains all the subdirectories to search for the tags from.");
-    Console.WriteLine(" tag-list-string: tags separate by commas.");
-    Console.WriteLine(" any|all: whether to find the directories that contain any or all of the tags in the list");
-    Console.WriteLine(" output-dir: the directory where the shortcuts to all the found directories are put");
+    Console.WriteLine("Usage 1: <input-root-dir> <tag-list-string> <any|all> <output-dir>");
+    Console.WriteLine(" input-root-dir: The directory contains all the subdirectories to search for the tags from.");
+    Console.WriteLine(" tag-list-string: Tags separate by commas.");
+    Console.WriteLine(" any|all: Whether to find the directories that contain any or all of the tags in the list.");
+    Console.WriteLine(" output-dir: The directory where the shortcuts to all the found directories are put.");
+    Console.WriteLine("Usage 2: <input-root-dir> list");
+    Console.WriteLine(" To display all tags.");
+    Console.WriteLine("-h: To show this help.");
 }
