@@ -1,8 +1,8 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-
 using System.Text;
 using Taglite;
+using static Taglite.Util;
 
 if (args.Length < 1)
 {
@@ -17,9 +17,16 @@ if (args.Length == 1 && args[0] == "-h")
 }
 
 var cmd = args[0].Trim().ToLower();
+
+if (cmd == "tag")
+{
+    Tagger.ProcessArgs(args);
+    return;
+}
+
 if (cmd == "alltags")
 {
-    var storeDirToShowAllTags = CompleteDir(TryGetArg(1), "taglite_store");
+    var storeDirToShowAllTags = CompleteDir(TryGetArg(args, 1), "taglite_store");
     if (storeDirToShowAllTags == null)
     {
         Console.WriteLine($"<store-dir> '{storeDirToShowAllTags}' is not provided or does not exist.");
@@ -41,8 +48,8 @@ if (args.Length < 1 || args.Length > 4)
     return;
 }
 
-var viewDir = CompleteDir(TryGetArg(2), "taglite_view");
-var storeDir = CompleteDir(TryGetArg(3), "taglite_store");
+var viewDir = CompleteDir(TryGetArg(args, 2), "taglite_view");
+var storeDir = CompleteDir(TryGetArg(args, 3), "taglite_store");
 
 if (storeDir == null || !Directory.Exists(storeDir))
 {
@@ -68,7 +75,7 @@ HashSet<TagNode> nodes;
 bool expandFiles = false;
 {
     var tagRepo = GetTagRepo(storeDir);
-    var tagListString = TryGetArg(1);
+    var tagListString = TryGetArg(args, 1);
     var tags = tagListString?.Split(',', StringSplitOptions.RemoveEmptyEntries|StringSplitOptions.TrimEntries).Select(x=>x.ToLower());
     if (cmd.Length < 3)
     {
@@ -118,7 +125,7 @@ foreach (var node in nodes)
         var prefix = clashResolver.New(dirName);
         foreach (var item in node.EnumerateContents())
         {
-            var rel = Util.GetRelative(item.FullName, dir.FullName);
+            var rel = GetRelative(item.FullName, dir.FullName);
             var target = Path.Combine(viewDir, prefix + "-" + rel);
             if (item is FileInfo fileInfo)
             {
@@ -172,8 +179,6 @@ string? CompleteDir(string? inputDir, string backupEnvVariable)
     }
 }
 
-string? TryGetArg(int index, string? defaultStr=null)=>args.Length > index? args[index] : defaultStr;
-
 void PrintUsage()
 {
     Console.WriteLine("Usage 1: (any|all)(f|) [<tag-list-string>] [<view-dir>] [<store-dir>]");
@@ -184,6 +189,7 @@ void PrintUsage()
     Console.WriteLine(" <store-dir>: The directory contains all the subdirectories to search for the tags from.");
     Console.WriteLine("Usage 2: alltags [<store-dir>]");
     Console.WriteLine(" To list all the tags from <store-dir> in alphabetic order.");
+    Console.WriteLine($"Usage 3: {Tagger.UsageString()}");
     Console.WriteLine("To show this help: -h");
 }
 
