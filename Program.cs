@@ -185,8 +185,8 @@ void PrintUsage()
     Console.WriteLine(" any|all: Whether to find the directories that contain any or all of the tags in the list.");
     Console.WriteLine(" f: Create file symlinks instead.");
     Console.WriteLine(" <tag-list-string>: Tags separate by commas. Optional only if 'any' is chosen.");
-    Console.WriteLine(" <view-dir>: The directory where the shortcuts to all the found directories are put.");
-    Console.WriteLine(" <store-dir>: The directory contains all the subdirectories to search for the tags from.");
+    Console.WriteLine(" <view-dir>: The directory where the shortcuts to all the found directories are put. When absent taglite_view env variable is used.");
+    Console.WriteLine(" <store-dir>: The directory contains all the subdirectories to search for the tags from. When absent taglite_store env variable is used.");
     Console.WriteLine("Usage 2: alltags [<store-dir>]");
     Console.WriteLine(" To list all the tags from <store-dir> in alphabetic order.");
     Console.WriteLine($"Usage 3: {Tagger.UsageString()}");

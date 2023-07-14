@@ -71,7 +71,6 @@ namespace Taglite
                     }
                 }
             }
-
         }
 
         static void PrintUsage()
@@ -81,7 +80,11 @@ namespace Taglite
 
         internal static string UsageString()
         {
-            return "tag <tag-list-string> <destination-folder> (<list-of-files-to-tag>|<folder-to-tag>)";
+            var sb = new StringBuilder();
+            sb.AppendLine("tag <tag-list-string> <store-dir> (<list-of-files-or-dirs-to-tag>|<folder-to-tag>)");
+            sb.AppendLine(" <list-of-files-to-tag>: A list of files and directories to be moved to a timestamp named tagged folder in <store-dir>.");
+            sb.Append(" <folder-to-tag>: A folder of which the content is moved to a timestamp named tagged folder in <store-dir>");
+            return sb.ToString();
         }
     }
 }
