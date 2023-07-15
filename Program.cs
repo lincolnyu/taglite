@@ -48,7 +48,7 @@ if (args.Length < 1 || args.Length > 4)
     return;
 }
 
-var viewDir = CompleteDir(TryGetArg(args, 2), "taglite_view");
+var viewDir = CompleteDir(TryGetArg(args, 1), "taglite_view");
 var storeDir = CompleteDir(TryGetArg(args, 3), "taglite_store");
 
 if (storeDir == null || !Directory.Exists(storeDir))
@@ -75,7 +75,7 @@ HashSet<TagNode> nodes;
 bool expandFiles = false;
 {
     var tagRepo = GetTagRepo(storeDir);
-    var tagListString = TryGetArg(args, 1);
+    var tagListString = TryGetArg(args, 2);
     var tags = tagListString?.Split(',', StringSplitOptions.RemoveEmptyEntries|StringSplitOptions.TrimEntries).Select(x=>x.ToLower());
     if (cmd.Length < 3)
     {
@@ -181,11 +181,11 @@ string? CompleteDir(string? inputDir, string backupEnvVariable)
 
 void PrintUsage()
 {
-    Console.WriteLine("Usage 1: (any|all)(f|) [<tag-list-string>] [<view-dir>] [<store-dir>]");
+    Console.WriteLine("Usage 1: (any|all)(f|) [<view-dir>] [<tag-list-string>] [<store-dir>]");
     Console.WriteLine(" any|all: Whether to find the directories that contain any or all of the tags in the list.");
     Console.WriteLine(" f: Create file symlinks instead.");
-    Console.WriteLine(" <tag-list-string>: Tags separate by commas. Optional only if 'any' is chosen.");
     Console.WriteLine(" <view-dir>: The directory where the shortcuts to all the found directories are put. When absent taglite_view env variable is used.");
+    Console.WriteLine(" <tag-list-string>: Tags separate by commas. Optional only if 'any' is chosen.");
     Console.WriteLine(" <store-dir>: The directory contains all the subdirectories to search for the tags from. When absent taglite_store env variable is used.");
     Console.WriteLine("Usage 2: alltags [<store-dir>]");
     Console.WriteLine(" To list all the tags from <store-dir> in alphabetic order.");
