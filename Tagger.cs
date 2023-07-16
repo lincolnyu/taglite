@@ -9,6 +9,7 @@ namespace Taglite
             if (args.Length < 3)
             {
                 PrintUsage();
+                return;
             }
 
             var tagStoreDirStr = args[1];
