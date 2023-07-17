@@ -4,6 +4,52 @@ namespace Taglite
 {
     class Tagger
     {
+        static DateTime? StringToDateTime(string str)
+        {
+            try
+            {
+                int year, month=1, day=1;
+                int hour=0, minute=0;
+                if (str.Length >= 2)
+                {
+                    year = int.Parse(str[0..2]);
+                    if (year >= 70)
+                    {
+                        year += 1900;
+                    }
+                    else
+                    {
+                        year += 2000;
+                    }
+                }
+                else
+                {
+                    throw new ArgumentException("Date string have less than 2 characters.");
+                }
+                if (str.Length >= 4)
+                {
+                    month = int.Parse(str[2..4]);
+                }
+                if (str.Length >= 6)
+                {
+                    day = int.Parse(str[4..6]);
+                }
+                if (str.Length >= 8)
+                {
+                    hour = int.Parse(str[6..8]);
+                }
+                if (str.Length >= 10)
+                {
+                    minute = int.Parse(str[8..10]);
+                }
+                return new DateTime(year, month, day, hour, minute, 0);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
         public static void ProcessArgs(string[] args)
         {
             if (args.Length < 3)
@@ -27,8 +73,22 @@ namespace Taglite
             var tagListString = args[2];
             var tags = tagListString!.Split(',', StringSplitOptions.RemoveEmptyEntries|StringSplitOptions.TrimEntries).Order().Select(x=>x.ToLower());
 
-            var now = DateTime.Now;
-            var subdirName = $"{now.Year%100:00}{now.Month:00}{now.Day:00}{now.Hour:00}{now.Minute:00}";
+            string? dateStr = null;
+            tags = tags.Where(x=>{
+                if (x.StartsWith('[') && x.EndsWith(']'))
+                {
+                    dateStr = x[1..(x.Length-1)];
+                    return false;
+                }
+                return true;
+            }).ToList();
+
+            var dateTime = dateStr!=null?StringToDateTime(dateStr):null;
+            if (dateTime == null)
+            {
+                dateTime = DateTime.Now;
+            }
+            var subdirName = $"{dateTime.Value.Year%100:00}{dateTime.Value.Month:00}{dateTime.Value.Day:00}{dateTime.Value.Hour:00}{dateTime.Value.Minute:00}";
 
             string subdirFullName;            
             var sourceItems = args[3..];
@@ -73,6 +133,8 @@ namespace Taglite
                     sw.WriteLine(tag);
                 }
             }
+
+            System.Diagnostics.Process.Start("explorer.exe", subdirFullName);
         }
 
         static void PrintUsage()

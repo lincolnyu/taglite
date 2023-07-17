@@ -61,15 +61,6 @@ if (viewDir == null)
     Console.WriteLine($"<view-dir> '{viewDir}' is not provided or does not exist.");
     return;
 }
-if (!Directory.Exists(viewDir))
-{
-    Directory.CreateDirectory(viewDir);
-    if (!Directory.Exists(viewDir))
-    {
-        Console.WriteLine($"<view-dir> '{viewDir}' does not exist and cannot be created.");
-        return;
-    }
-}
 
 HashSet<TagNode> nodes;
 bool expandFiles = false;
@@ -115,6 +106,16 @@ bool expandFiles = false;
     expandFiles = (cmd.Length == 4 && cmd[3] == 'f');
 }
 
+if (!Directory.Exists(viewDir))
+{
+    Directory.CreateDirectory(viewDir);
+    if (!Directory.Exists(viewDir))
+    {
+        Console.WriteLine($"<view-dir> '{viewDir}' does not exist and cannot be created.");
+        return;
+    }
+}
+
 var clashResolver = new NameClashResolver();
 foreach (var node in nodes)
 {
@@ -150,6 +151,8 @@ foreach (var node in nodes)
         System.Diagnostics.Process.Start("cmd.exe", "/c mklink /d \"" + Path.Combine(viewDir, name) + "\" \"" + node.Directory + "\"");
     }
 }
+
+System.Diagnostics.Process.Start("explorer.exe", viewDir);
 
 TagRepo GetTagRepo(string dir)
 {
