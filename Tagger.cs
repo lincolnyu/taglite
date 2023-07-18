@@ -139,7 +139,8 @@ namespace Taglite
 
         static void PrintUsage()
         {
-            Console.WriteLine($"Tagger usage: {UsageString()}");
+            Console.WriteLine($"== Tagger ===");
+            Console.WriteLine($"{UsageString()}");
         }
 
         internal static string UsageString()
