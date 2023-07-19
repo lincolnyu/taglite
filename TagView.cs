@@ -179,7 +179,7 @@ namespace Taglite
                     foreach (var item in node.EnumerateContents())
                     {
                         var rel = GetRelative(item.FullName, dir.FullName);
-                        var viewLink = Path.Combine(viewDir, prefix + "-" + rel);
+                        var viewLink = Path.Combine(viewDir, prefix + rel);
                         if (item is FileInfo fileInfo)
                         {
                             CreateFileLink(viewLink, fileInfo.FullName, hardLink:true);

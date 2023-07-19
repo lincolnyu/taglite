@@ -68,6 +68,7 @@ namespace Taglite
             }
             foreach (var dir in startingDir.GetDirectories())
             {
+                yield return dir;
                 foreach (var item in EnumerateContentsRecursiveUntilTagged(dir))
                 {
                     yield return item;
@@ -87,6 +88,7 @@ namespace Taglite
             }
             foreach (var dir in startingDir.GetDirectories())
             {
+                yield return dir;
                 foreach (var item in EnumerateContentsRecursiveUntilTagged(dir))
                 {
                     yield return item;
