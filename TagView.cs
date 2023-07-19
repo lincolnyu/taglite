@@ -164,7 +164,9 @@ namespace Taglite
                 }
             }
 
-            bool useSymlink = false;
+            // Shows the folder immediately as the hardlink creation involving downloading may take time
+            System.Diagnostics.Process.Start("explorer.exe", viewDir);
+
             var clashResolver = new NameClashResolver();
             foreach (var node in nodes)
             {
@@ -172,18 +174,19 @@ namespace Taglite
                 if (expandFiles)
                 {
                     var dirName = dir.Name;
-                    var prefix = clashResolver.New(dirName);
+                    var prefix = clashResolver.New(dirName) + "-";
+                    // TODO test this with subfolders
                     foreach (var item in node.EnumerateContents())
                     {
                         var rel = GetRelative(item.FullName, dir.FullName);
-                        var target = Path.Combine(viewDir, prefix + "-" + rel);
+                        var viewLink = Path.Combine(viewDir, prefix + "-" + rel);
                         if (item is FileInfo fileInfo)
                         {
-                            System.Diagnostics.Process.Start("cmd.exe", "/c mklink \"" + target + "\" \"" + fileInfo.FullName + "\"");
+                            CreateFileLink(viewLink, fileInfo.FullName, hardLink:true);
                         }
                         else if (item is DirectoryInfo dirInfo)
                         {
-                            Directory.CreateDirectory(target);
+                            Directory.CreateDirectory(viewLink);
                         }
                     }
                 }
@@ -197,17 +200,6 @@ namespace Taglite
                         sb.Append(tag);
                     }
                     var name = clashResolver.New(sb.ToString());
-                    if (useSymlink)
-                    {
-                        try
-                        {
-                        }
-                        catch(Exception)
-                        {
-                            useSymlink = false;
-                        }
-                    }
-                    
                     switch (mode)
                     {
                         case 'l':
@@ -222,8 +214,6 @@ namespace Taglite
                     }
                 }
             }
-
-            System.Diagnostics.Process.Start("explorer.exe", viewDir);
         }
 
         static void CreateShortcut(string source, string target)
@@ -241,6 +231,11 @@ namespace Taglite
             sbScript.Append($"explorer.exe {target}");
             using var sw = new StreamWriter(source);
             sw.Write(sbScript.ToString());       
+        }
+        static void CreateFileLink(string source, string target, bool hardLink)
+        {
+            var hardLinkArg = hardLink? " /h" : "";
+            System.Diagnostics.Process.Start("cmd.exe", "/c mklink" + hardLinkArg + " \"" + source + "\" \"" + target + "\"");
         }
 
         static TagRepo GetTagRepo(string dir)

@@ -120,7 +120,7 @@ namespace Taglite
                     else if (Directory.Exists(item))
                     {
                         var dir  = new DirectoryInfo(item);
-                        dir.MoveTo(Path.Combine(subdirFullName));
+                        dir.MoveTo(Path.Combine(subdirFullName, dir.Name));
                     }
                 }
             }
