@@ -1,4 +1,4 @@
 @echo off
 cd %~dp0
 cd ..
-dotnet run -- tag env %*
+dotnet run -- tag . %*

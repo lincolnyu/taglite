@@ -1,4 +1,4 @@
-namespace Taglite
+namespace Taglite.Core
 {
     class TagScanner
     {

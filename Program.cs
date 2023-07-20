@@ -23,6 +23,10 @@ if (cmd == "tag")
 {
     Tagger.ProcessArgs(args);
 }
+if (cmd == "replace")
+{
+    TagReplacer.ProcessArgs(args);
+}
 else
 {
     TagView.ProcessArgs(args);
@@ -32,5 +36,6 @@ void PrintUsage()
 {
     Console.WriteLine(Tagger.UsageString());
     Console.WriteLine(TagView.UsageString());
+    Console.WriteLine(TagReplacer.UsageString());
     Console.WriteLine("To show this help: -h");
 }

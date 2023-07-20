@@ -1,4 +1,5 @@
 using System.Text;
+using Taglite.Core;
 using static Taglite.Util;
 
 namespace Taglite
@@ -44,7 +45,7 @@ namespace Taglite
             if (cmd == "alltags")
             {
                 var storeDirToShowAllTags = CompleteDir(TryGetArg(args, 1), "taglite_store");
-                if (storeDirToShowAllTags == null)
+                if (storeDirToShowAllTags == null || !Directory.Exists(storeDirToShowAllTags))
                 {
                     Console.WriteLine($"<store-dir> '{storeDirToShowAllTags}' is not provided or does not exist.");
                     return;
@@ -243,27 +244,6 @@ namespace Taglite
             var tagScanner = new TagScanner(dir);
             var tagRepo = tagScanner.Scan();
             return tagRepo;
-        }
-
-        static string? CompleteDir(string? inputDir, string backupEnvVariable)
-        {
-            if (Path.IsPathRooted(inputDir))
-            {
-                return inputDir;
-            }
-            else 
-            {
-                var defaultTagStore = Environment.GetEnvironmentVariable(backupEnvVariable);
-                if (defaultTagStore == null)
-                {
-                    return null;
-                }
-                if (inputDir != null)
-                {
-                    return Path.Combine(defaultTagStore!, inputDir);
-                }
-                return defaultTagStore!;
-            }
         }
     }
 }

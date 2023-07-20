@@ -1,4 +1,4 @@
-namespace Taglite
+namespace Taglite.Core
 {
     class TagNode
     {
@@ -15,12 +15,31 @@ namespace Taglite
                 if (_tags == null)
                 {
                     var tagFile = Path.Combine(Directory, TagliteFileName);
-                    _tags = new HashSet<string>(LoadTagsFromTagFile(tagFile));
+                    if (File.Exists(tagFile))
+                    {
+                        _tags = new HashSet<string>(LoadTagsFromTagFile(tagFile));
+                    }
+                    else
+                    {
+                        _tags = new HashSet<string>();
+                    }
                 }
                 return _tags;
             }
         }
         private HashSet<string>? _tags;
+
+        public void SaveToFile()
+        {
+            var tagFileName = Path.Combine(Directory, TagliteFileName);
+            using (var sw = new StreamWriter(tagFileName))
+            {
+                foreach (var tag in Tags)
+                {
+                    sw.WriteLine(tag);
+                }
+            }
+        }
 
         public static bool IsTaggedDirectory(string directory)
         {
@@ -31,7 +50,6 @@ namespace Taglite
         public static IEnumerable<string> LoadTagsFromTagFile(string tagFile)
         {
             using var sr = new StreamReader(tagFile);
-            
             while (!sr.EndOfStream)
             {
                 var line = sr.ReadLine();

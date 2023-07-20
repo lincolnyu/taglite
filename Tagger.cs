@@ -1,4 +1,6 @@
 using System.Text;
+using Taglite.Core;
+using static Taglite.Util;
 
 namespace Taglite
 {
@@ -58,11 +60,7 @@ namespace Taglite
                 return;
             }
 
-            var tagStoreDirStr = args[1];
-            if (tagStoreDirStr == "env")
-            {
-                tagStoreDirStr = Environment.GetEnvironmentVariable("taglite_store");
-            }
+            var tagStoreDirStr = CompleteDir(args[1], "taglite_store");
             if (!Directory.Exists(tagStoreDirStr))
             {
                 Console.WriteLine($"Store directory '{tagStoreDirStr}' does not exist.");
@@ -125,21 +123,18 @@ namespace Taglite
                 }
             }
 
-            var tagFileName = Path.Combine(subdirFullName, ".taglite");
-            using (var sw = new StreamWriter(tagFileName))
+            var tagNode = new TagNode(subdirFullName);
+            foreach (var tag in tags)
             {
-                foreach (var tag in tags)
-                {
-                    sw.WriteLine(tag);
-                }
+                tagNode.Tags.Add(tag);
             }
+            tagNode.SaveToFile();
 
             System.Diagnostics.Process.Start("explorer.exe", subdirFullName);
         }
 
         static void PrintUsage()
         {
-            Console.WriteLine();
             Console.WriteLine($"{UsageString()}");
         }
 
@@ -147,7 +142,9 @@ namespace Taglite
         {
             var sb = new StringBuilder("=== Tagger ===\n");
             sb.AppendLine("tag <store-dir> <tag-list-string> (<list-of-files-or-dirs-to-tag>|<folder-to-tag>)");
-            sb.AppendLine(" <list-of-files-to-tag>: A list of files and directories to be moved to a timestamp named tagged folder in <store-dir>.");
+            sb.AppendLine(" <store-dir>: The directory contains all the subdirectories to search for the tags from. When absent taglite_store env variable is used.");
+            sb.AppendLine(" <tag-list-string>: Tags separate by commas.");
+            sb.AppendLine(" <list-of-files-or-dirs-to-tag>: A list of files and directories to be moved to a timestamp named tagged folder in <store-dir>.");
             sb.Append(" <folder-to-tag>: A folder of which the content is moved to a timestamp named tagged folder in <store-dir>");
             return sb.ToString();
         }
