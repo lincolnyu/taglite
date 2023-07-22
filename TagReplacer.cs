@@ -38,6 +38,7 @@ namespace Taglite
             if (storeDir == null || !Directory.Exists(storeDir))
             {
                 Console.WriteLine($"<store-dir> '{storeDir}' is not provided or does not exist.");
+                return;
             }
             var repl = new List<(string, string)>();
             var split = args[2].Split(',', StringSplitOptions.RemoveEmptyEntries|StringSplitOptions.TrimEntries).Select(x=>x.ToLower());
@@ -55,7 +56,7 @@ namespace Taglite
             Replace(new DirectoryInfo(storeDir!), repl);
         }
 
-        static void PrintUsage()
+        public static void PrintUsage()
         {
             Console.WriteLine($"{UsageString()}");
         }

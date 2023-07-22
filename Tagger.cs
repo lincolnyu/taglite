@@ -86,7 +86,16 @@ namespace Taglite
             {
                 dateTime = DateTime.Now;
             }
-            var subdirName = $"{dateTime.Value.Year%100:00}{dateTime.Value.Month:00}{dateTime.Value.Day:00}{dateTime.Value.Hour:00}{dateTime.Value.Minute:00}";
+
+            string subdirName;
+            for (var dtval = dateTime.Value; ; dtval.AddMinutes(1))
+            {
+                subdirName = $"{dtval.Year%100:00}{dtval.Month:00}{dtval.Day:00}{dtval.Hour:00}{dtval.Minute:00}";
+                if (!Directory.Exists(subdirName))
+                {
+                    break;
+                }
+            }
 
             string subdirFullName;            
             var sourceItems = args[3..];
@@ -133,7 +142,7 @@ namespace Taglite
             System.Diagnostics.Process.Start("explorer.exe", subdirFullName);
         }
 
-        static void PrintUsage()
+        public static void PrintUsage()
         {
             Console.WriteLine($"{UsageString()}");
         }

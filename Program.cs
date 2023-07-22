@@ -1,8 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using System.Text;
 using Taglite;
-using static Taglite.Util;
 
 
 if (args.Length < 1)
@@ -18,18 +16,40 @@ if (args.Length == 1 && args[0] == "-h")
 }
 
 var cmd = args[0].Trim().ToLower();
+var needsHelp = args.Contains("-h");
 
 if (cmd == "tag")
 {
-    Tagger.ProcessArgs(args);
+    if (needsHelp)
+    {
+        Tagger.PrintUsage();
+    }
+    else
+    {
+        Tagger.ProcessArgs(args);
+    }
 }
-if (cmd == "replace")
+else if (cmd == "replace")
 {
-    TagReplacer.ProcessArgs(args);
+    if (needsHelp)
+    {
+        TagReplacer.PrintUsage();
+    }
+    else
+    {
+        TagReplacer.ProcessArgs(args);
+    }
 }
 else
 {
-    TagView.ProcessArgs(args);
+    if (needsHelp)
+    {
+        TagView.PrintUsage();
+    }
+    else
+    {
+        TagView.ProcessArgs(args);
+    }
 }
 
 void PrintUsage()

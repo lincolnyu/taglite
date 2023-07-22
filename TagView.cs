@@ -23,7 +23,7 @@ namespace Taglite
             return sb.ToString();
         }
 
-        static void PrintUsage()
+        public static void PrintUsage()
         {
             Console.WriteLine($"{UsageString()}");
         }
@@ -40,7 +40,7 @@ namespace Taglite
         }
 
         public static void ProcessArgs(string[] args)
-        {
+        {   
             var cmd = args[0].Trim().ToLower();
             if (cmd == "alltags")
             {
@@ -51,7 +51,7 @@ namespace Taglite
                     return;
                 }
                 var tagRepo = GetTagRepo(storeDirToShowAllTags);
-                Console.WriteLine("All tags:");
+                Console.Write("All tags:");
                 foreach (var kvp in tagRepo.TagMapping.Order(TagComparer.Instance))
                 {
                     Console.Write(" ");
@@ -66,6 +66,7 @@ namespace Taglite
 
             if (args.Length < 1 || args.Length > 4)
             {
+                Console.WriteLine("Invalid arguments.");
                 PrintUsage();
                 return;
             }
