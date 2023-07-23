@@ -18,8 +18,8 @@ namespace Taglite
             sb.AppendLine(" <view-dir>: The directory where the shortcuts to all the found directories are put. When absent taglite_view env variable is used.");
             sb.AppendLine(" <tag-list-string>: Tags separate by commas. Optional only if 'any' is chosen.");
             sb.AppendLine(" <store-dir>: The directory contains all the subdirectories to search for the tags from. When absent taglite_store env variable is used.");
-            sb.AppendLine("Usage 2: alltags [<store-dir>]");
-            sb.Append(" To list all the tags from <store-dir> in alphabetic order.");
+            sb.AppendLine("Usage 2: alltags [<store-dir>] [<tag-list-string>]");
+            sb.Append(" To list all the tags or the specified tags from <store-dir> in alphabetic order.");
             return sb.ToString();
         }
 
@@ -45,15 +45,28 @@ namespace Taglite
             if (cmd == "alltags")
             {
                 var storeDirToShowAllTags = CompleteDir(TryGetArg(args, 1), "taglite_store");
+                
+                var tagsString = TryGetArg(args, 2);
+                var tags = tagsString?.Split(',', StringSplitOptions.RemoveEmptyEntries|StringSplitOptions.TrimEntries).Select(x=>x.ToLower());
+                HashSet<string>? setTagsToShow = null;
+                if (tags != null)
+                {
+                    setTagsToShow = new HashSet<string>(tags);
+                }
+
                 if (storeDirToShowAllTags == null || !Directory.Exists(storeDirToShowAllTags))
                 {
                     Console.WriteLine($"<store-dir> '{storeDirToShowAllTags}' is not provided or does not exist.");
                     return;
                 }
                 var tagRepo = GetTagRepo(storeDirToShowAllTags);
-                Console.Write("All tags:");
+                Console.Write("Found:");
                 foreach (var kvp in tagRepo.TagMapping.Order(TagComparer.Instance))
                 {
+                    if (setTagsToShow?.Contains(kvp.Key) == false)
+                    {
+                        continue;
+                    }
                     Console.Write(" ");
                     Console.Write(kvp.Key);
                     if (kvp.Value.Count > 1)
