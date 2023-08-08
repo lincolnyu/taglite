@@ -69,6 +69,5 @@ namespace Taglite
             sb.Append(" orig-tag?:new-tag?: orig-tag? is to be replaced by new-tag?");
             return sb.ToString();
         }
-
     }
 }

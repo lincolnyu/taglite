@@ -40,6 +40,17 @@ else if (cmd == "replace")
         TagReplacer.ProcessArgs(args);
     }
 }
+else if (cmd == "fix")
+{
+    if (needsHelp)
+    {
+        TagFixer.PrintUsage();
+    }
+    else
+    {
+        TagFixer.ProcessArgs(args);
+    }
+}
 else
 {
     if (needsHelp)

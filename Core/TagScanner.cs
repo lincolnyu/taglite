@@ -6,23 +6,39 @@ namespace Taglite.Core
         {
             RootDirectory = rootDirectory;
         }
+
         public string RootDirectory {get;}
+
         public void ScanAndAddTo(TagRepo tagRepo)
         {
             ScanAndAddTo(new DirectoryInfo(RootDirectory), tagRepo);
         }
 
-        private void ScanAndAddTo(DirectoryInfo directory, TagRepo tagRepo)
+        public static IEnumerable<TagNode> EnumerateAllTagNodes(DirectoryInfo directory)
         {
             var dirName = directory.FullName;
             if (!dirName.EndsWith(Path.DirectorySeparatorChar))
             {
                 dirName += Path.DirectorySeparatorChar;
             }
-            tagRepo.AddDirectoryIfTagged(dirName);
+            if (TagNode.IsTaggedDirectory(dirName))
+            {
+                yield return new TagNode(dirName);
+            }
             foreach (var dir in directory.GetDirectories())
             {
-                ScanAndAddTo(dir, tagRepo);
+                foreach (var node in EnumerateAllTagNodes(dir))
+                {
+                    yield return node;
+                }
+            }
+        }
+
+        private void ScanAndAddTo(DirectoryInfo directory, TagRepo tagRepo)
+        {
+            foreach (var node in EnumerateAllTagNodes(directory))
+            {
+                tagRepo.AddNode(node);
             }
         }
 

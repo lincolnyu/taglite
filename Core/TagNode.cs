@@ -17,7 +17,7 @@ namespace Taglite.Core
                     var tagFile = Path.Combine(Directory, TagliteFileName);
                     if (File.Exists(tagFile))
                     {
-                        _tags = new HashSet<string>(LoadTagsFromTagFile(tagFile));
+                        _tags = new HashSet<string>(LoadTagsFromTagFile(tagFile).Select(x=>x.Item1));
                     }
                     else
                     {
@@ -32,9 +32,10 @@ namespace Taglite.Core
         public void SaveToFile()
         {
             var tagFileName = Path.Combine(Directory, TagliteFileName);
+            var tags = Tags;
             using (var sw = new StreamWriter(tagFileName))
             {
-                foreach (var tag in Tags)
+                foreach (var tag in tags)
                 {
                     sw.WriteLine(tag);
                 }
@@ -47,7 +48,13 @@ namespace Taglite.Core
             return File.Exists(tagFile);
         }
 
-        public static IEnumerable<string> LoadTagsFromTagFile(string tagFile)
+        public bool Validate()
+        {
+            var tagFile = Path.Combine(Directory, TagliteFileName);
+            return LoadTagsFromTagFile(tagFile).All(x=>x.Item2);
+        }
+
+        public static IEnumerable<(string, bool)> LoadTagsFromTagFile(string tagFile)
         {
             using var sr = new StreamReader(tagFile);
             while (!sr.EndOfStream)
@@ -55,9 +62,16 @@ namespace Taglite.Core
                 var line = sr.ReadLine();
                 var tag = line?.Trim()?.ToLower();
                 if (string.IsNullOrEmpty(tag)) continue;
-                yield return tag;
+                var validatedTag = ValidateTag(tag);
+                yield return (validatedTag, validatedTag == tag);
             }
         }
+
+        private static string ValidateTag(string tag)
+        {
+            return tag.Replace(",", "").Replace(" ", "").Replace("\t", "");
+        }
+
         public void Invalidate()
         {
             _tags = null;
