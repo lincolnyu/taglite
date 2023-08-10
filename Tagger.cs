@@ -84,7 +84,15 @@ namespace Taglite
             var dateTime = dateStr!=null?StringToDateTime(dateStr):null;
             if (dateTime == null)
             {
-                dateTime = DateTime.Now;
+                var dateOverride = Environment.GetEnvironmentVariable(Constants.EnvVar.DateOverride);
+                if (dateOverride != null)
+                {
+                    dateTime = StringToDateTime(dateOverride);
+                }
+                if (dateTime == null)
+                {
+                    dateTime = DateTime.Now;
+                }
             }
 
             string subdirName;

@@ -27,7 +27,7 @@ namespace Taglite
                 PrintUsage();
                 return;
             }
-            var storeDir = CompleteDir(args[1], "taglite_store");
+            var storeDir = CompleteDir(args[1], Constants.EnvVar.StoreDir);
             if (storeDir == null || !Directory.Exists(storeDir))
             {
                 Console.WriteLine($"<store-dir> '{storeDir}' is not provided or does not exist.");
@@ -45,7 +45,7 @@ namespace Taglite
         {
             var sb = new StringBuilder("=== TagFixer ===\n");
             sb.AppendLine("fix <store-dir>");
-            sb.AppendLine(" <store-dir>: The directory where the tags are to be fixed. When absent taglite_store env variable is used.");
+            sb.AppendLine($" <store-dir>: The directory where the tags are to be fixed. When absent, {Constants.EnvVar.StoreDir} env variable is used.");
             return sb.ToString();
         }
     }

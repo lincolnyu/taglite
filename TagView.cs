@@ -15,9 +15,9 @@ namespace Taglite
             sb.AppendLine(" s: Create symlinks to target directories.");
             sb.AppendLine(" c: Create command based links to target directories.");
             sb.AppendLine(" f: Create symlinks to contents of the all the target directories.");
-            sb.AppendLine(" <view-dir>: The directory where the shortcuts to all the found directories are put. When absent taglite_view env variable is used.");
+            sb.AppendLine($" <view-dir>: The directory where the shortcuts to all the found directories are put. When absent, {Constants.EnvVar.ViewDir} env variable is used.");
             sb.AppendLine(" <tag-list-string>: Tags separate by commas. Optional only if 'any' is chosen.");
-            sb.AppendLine(" <store-dir>: The directory contains all the subdirectories to search for the tags from. When absent taglite_store env variable is used.");
+            sb.AppendLine($" <store-dir>: The directory contains all the subdirectories to search for the tags from. When absent, {Constants.EnvVar.StoreDir} env variable is used.");
             sb.AppendLine("Usage 2: alltags [<store-dir>] [<tag-list-string>]");
             sb.Append(" To list all the tags or the specified tags from <store-dir> in alphabetic order.");
             return sb.ToString();
@@ -44,7 +44,7 @@ namespace Taglite
             var cmd = args[0].Trim().ToLower();
             if (cmd == "alltags")
             {
-                var storeDirToShowAllTags = CompleteDir(TryGetArg(args, 1), "taglite_store");
+                var storeDirToShowAllTags = CompleteDir(TryGetArg(args, 1), Constants.EnvVar.StoreDir);
                 
                 var tagsString = TryGetArg(args, 2);
                 var tags = tagsString?.Split(',', StringSplitOptions.RemoveEmptyEntries|StringSplitOptions.TrimEntries).Select(x=>x.ToLower());
@@ -84,9 +84,9 @@ namespace Taglite
                 return;
             }
 
-            var viewDir = CompleteDir(TryGetArg(args, 1), "taglite_view");
+            var viewDir = CompleteDir(TryGetArg(args, 1), Constants.EnvVar.ViewDir);
             var tagListString = TryGetArg(args, 2);
-            var storeDir = CompleteDir(TryGetArg(args, 3), "taglite_store");
+            var storeDir = CompleteDir(TryGetArg(args, 3), Constants.EnvVar.StoreDir);
 
             Run(cmd, viewDir, tagListString, storeDir);
         }

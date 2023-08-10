@@ -34,7 +34,7 @@ namespace Taglite
                 PrintUsage();
                 return;
             }
-            var storeDir = CompleteDir(args[1], "taglite_store");
+            var storeDir = CompleteDir(args[1], Constants.EnvVar.StoreDir);
             if (storeDir == null || !Directory.Exists(storeDir))
             {
                 Console.WriteLine($"<store-dir> '{storeDir}' is not provided or does not exist.");
@@ -65,7 +65,7 @@ namespace Taglite
         {
             var sb = new StringBuilder("=== TagReplacer ===\n");
             sb.AppendLine("replace <store-dir> <orig-tag1>:<new-tag1>,<orig-tag2>:<new-tag2>,...");
-            sb.AppendLine(" <store-dir>: The directory contains all the subdirectories to search for the tags from. When absent taglite_store env variable is used.");
+            sb.AppendLine($" <store-dir>: The directory contains all the subdirectories to search for the tags from. When absent, {Constants.EnvVar.StoreDir} env variable is used.");
             sb.Append(" orig-tag?:new-tag?: orig-tag? is to be replaced by new-tag?");
             return sb.ToString();
         }
