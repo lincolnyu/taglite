@@ -96,16 +96,17 @@ namespace Taglite
             }
 
             string subdirName;
-            for (var dtval = dateTime.Value; ; dtval.AddMinutes(1))
+            string subdirFullName;  
+            for (var dtval = dateTime.Value; ; dtval = dtval.AddMinutes(1))
             {
                 subdirName = $"{dtval.Year%100:00}{dtval.Month:00}{dtval.Day:00}{dtval.Hour:00}{dtval.Minute:00}";
-                if (!Directory.Exists(subdirName))
+                subdirFullName = Path.Combine(tagStoreDirStr, subdirName);  
+                if (!Directory.Exists(subdirFullName))
                 {
                     break;
                 }
             }
 
-            string subdirFullName;            
             var sourceItems = args[3..];
             if (sourceItems.Length == 1 && Directory.Exists(sourceItems[0]))
             {
