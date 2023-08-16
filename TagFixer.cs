@@ -6,7 +6,6 @@ namespace Taglite
 {
     class TagFixer
     {
-
         static void Fix(string storeDir)
         {
             foreach (var node in TagScanner.EnumerateAllTagNodes(new DirectoryInfo(storeDir)))

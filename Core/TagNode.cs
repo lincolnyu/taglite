@@ -5,6 +5,11 @@ namespace Taglite.Core
         public const string TagliteFileName = ".taglite";
         public TagNode(string directory)
         {
+            // To normalize the directory path
+            if (!directory.EndsWith(Path.DirectorySeparatorChar))
+            {
+                directory += Path.DirectorySeparatorChar;
+            }
             Directory = directory;
         }
         public string Directory {get;}

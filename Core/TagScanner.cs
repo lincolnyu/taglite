@@ -17,10 +17,6 @@ namespace Taglite.Core
         public static IEnumerable<TagNode> EnumerateAllTagNodes(DirectoryInfo directory)
         {
             var dirName = directory.FullName;
-            if (!dirName.EndsWith(Path.DirectorySeparatorChar))
-            {
-                dirName += Path.DirectorySeparatorChar;
-            }
             if (TagNode.IsTaggedDirectory(dirName))
             {
                 yield return new TagNode(dirName);

@@ -8,9 +8,8 @@ namespace Taglite
     {
         public static void Replace(DirectoryInfo dir, IEnumerable<(string,string)> replacements)
         {
-            if (TagNode.IsTaggedDirectory(dir.FullName))
+            foreach (var tagNode in TagScanner.EnumerateAllTagNodes(dir))
             {
-                var tagNode = new TagNode(dir.FullName);
                 foreach (var repl in replacements)
                 {
                     if (tagNode.Tags.Remove(repl.Item1) && !string.IsNullOrWhiteSpace(repl.Item2))
@@ -19,10 +18,6 @@ namespace Taglite
                     }
                 }
                 tagNode.SaveToFile();
-            }
-            foreach (var subdir in dir.GetDirectories())
-            {
-                Replace(subdir, replacements);
             }
         }
 
