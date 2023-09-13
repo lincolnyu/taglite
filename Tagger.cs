@@ -52,6 +52,11 @@ namespace Taglite
             }
         }
 
+        public static DateTime GetLatestDateTimeFromFiles(IList<string> fileNames)
+        {
+            return fileNames.Select(fn => new FileInfo(fn).CreationTime).Max();
+        }
+
         public static void ProcessArgs(string[] args)
         {
             if (args.Length < 3)
@@ -81,20 +86,31 @@ namespace Taglite
                 return true;
             }).ToList();
 
-            var dateTime = dateStr!=null?StringToDateTime(dateStr):null;
-            if (dateTime == null)
+            var sourceItems = args[3..];
+
+            DateTime? dateTime = null;
+            if (dateStr != null && dateStr.Trim() == "" && sourceItems.Length > 0)
             {
-                var dateOverride = Environment.GetEnvironmentVariable(Constants.EnvVar.DateOverride);
-                if (dateOverride != null)
-                {
-                    dateTime = StringToDateTime(dateOverride);
-                }
-                if (dateTime == null)
-                {
-                    dateTime = DateTime.Now;
-                }
+                dateTime = GetLatestDateTimeFromFiles(sourceItems);
             }
 
+            if (dateTime == null)
+            {
+                dateTime = dateStr != null ? StringToDateTime(dateStr) : null;
+                if (dateTime == null)
+                {
+                    var dateOverride = Environment.GetEnvironmentVariable(Constants.EnvVar.DateOverride);
+                    if (dateOverride != null)
+                    {
+                        dateTime = StringToDateTime(dateOverride);
+                    }
+                    if (dateTime == null)
+                    {
+                        dateTime = DateTime.Now;
+                    }
+                }
+            }
+          
             string subdirName;
             string subdirFullName;  
             for (var dtval = dateTime.Value; ; dtval = dtval.AddMinutes(1))
@@ -107,7 +123,6 @@ namespace Taglite
                 }
             }
 
-            var sourceItems = args[3..];
             if (sourceItems.Length == 1 && Directory.Exists(sourceItems[0]))
             {
                 subdirFullName = Path.Combine(tagStoreDirStr, subdirName);
