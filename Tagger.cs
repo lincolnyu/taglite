@@ -176,9 +176,9 @@ namespace Taglite
             var sb = new StringBuilder("=== Tagger ===\n");
             sb.AppendLine("tag <store-dir> <tag-list-string> (<list-of-files-or-dirs-to-tag>|<folder-to-tag>)");
             sb.AppendLine(" <store-dir>: The directory contains all the subdirectories to search for the tags from. When absent taglite_store env variable is used.");
-            sb.AppendLine(" <tag-list-string>: Tags separate by commas.");
+            sb.AppendLine(" <tag-list-string>: Tags separate by commas. Optionally use [<date>|] to specify tag folder date, last creation date when absent. Env variable taglite_date_override if existent overrides.");
             sb.AppendLine(" <list-of-files-or-dirs-to-tag>: A list of files and directories to be moved to a timestamp named tagged folder in <store-dir>.");
-            sb.Append(" <folder-to-tag>: A folder of which the content is moved to a timestamp named tagged folder in <store-dir>");
+            sb.Append(" <folder-to-tag>: A folder of which the content is moved to a timestamp named tagged folder in <store-dir>.");
             return sb.ToString();
         }
     }
