@@ -113,24 +113,6 @@ namespace Taglite.Core
             }
         }
 
-        private static IEnumerable<FileSystemInfo> EnumerateContentsRecursiveUntilTagged(DirectoryInfo startingDir)
-        {
-            if (IsTaggedDirectory(startingDir.FullName))
-            {
-                yield break;
-            }
-            foreach (var file in startingDir.GetFiles())
-            {
-                yield return file;
-            }
-            foreach (var dir in startingDir.GetDirectories())
-            {
-                yield return dir;
-                foreach (var item in EnumerateContentsRecursiveUntilTagged(dir))
-                {
-                    yield return item;
-                }
-            }
-        }
+        private static IEnumerable<FileSystemInfo> EnumerateContentsRecursiveUntilTagged(DirectoryInfo startingDir)=>Util.WalkDirectory(startingDir, d=>IsTaggedDirectory(d.FullName));
     }
 }

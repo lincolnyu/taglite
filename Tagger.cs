@@ -52,9 +52,27 @@ namespace Taglite
             }
         }
 
+        public static IEnumerable<FileInfo> GetAllFilesIncludingInSubfolders(IEnumerable<string> fileNames)
+        {
+            foreach (var fn in fileNames)
+            {
+                if (File.Exists(fn))
+                {
+                    yield return new FileInfo(fn);
+                }
+                else if (Directory.Exists(fn))
+                {
+                    foreach (var fi in Core.Util.WalkDirectory(new DirectoryInfo(fn)).OfType<FileInfo>())
+                    {
+                        yield return fi;
+                    }
+                }
+            }
+        }
+
         public static DateTime GetLatestDateTimeFromFiles(IList<string> fileNames)
         {
-            return fileNames.Select(fn => new FileInfo(fn).CreationTime).Max();
+            return GetAllFilesIncludingInSubfolders(fileNames).Select(fn => fn.CreationTime).Max();
         }
 
         public static void ProcessArgs(string[] args)

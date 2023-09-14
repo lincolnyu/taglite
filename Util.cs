@@ -27,6 +27,5 @@ namespace Taglite
                 return defaultTagStore!;
             }
         }
-
     }
 }
