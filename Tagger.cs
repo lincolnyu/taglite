@@ -75,6 +75,11 @@ namespace Taglite
             return GetAllFilesIncludingInSubfolders(fileNames).Select(fn => fn.CreationTime).Max();
         }
 
+        public static DateTime GetEarliestDateTimeFromFiles(IList<string> fileNames)
+        {
+            return GetAllFilesIncludingInSubfolders(fileNames).Select(fn => fn.CreationTime).Min();
+        }
+
         public static void ProcessArgs(string[] args)
         {
             if (args.Length < 3)
@@ -106,10 +111,22 @@ namespace Taglite
 
             var sourceItems = args[3..];
 
-            DateTime? dateTime = null;
-            if (dateStr != null && dateStr.Trim() == "" && sourceItems.Length > 0)
+            if (dateStr != null)
             {
-                dateTime = GetLatestDateTimeFromFiles(sourceItems);
+                dateStr = dateStr.Trim();
+            }
+
+            DateTime? dateTime = null;
+            if (dateStr != null && sourceItems.Length > 0)
+            {
+                if (dateStr == "-" || dateStr == "")
+                {
+                    dateTime = GetEarliestDateTimeFromFiles(sourceItems);
+                }
+                else if (dateStr == "+")
+                {
+                    dateTime = GetLatestDateTimeFromFiles(sourceItems);
+                }
             }
 
             if (dateTime == null)
@@ -194,7 +211,7 @@ namespace Taglite
             var sb = new StringBuilder("=== Tagger ===\n");
             sb.AppendLine("tag <store-dir> <tag-list-string> (<list-of-files-or-dirs-to-tag>|<folder-to-tag>)");
             sb.AppendLine(" <store-dir>: The directory contains all the subdirectories to search for the tags from. When absent taglite_store env variable is used.");
-            sb.AppendLine(" <tag-list-string>: Tags separate by commas. Optionally use [<date>|] to specify tag folder date, last creation date when absent. Env variable taglite_date_override if existent overrides.");
+            sb.AppendLine(" <tag-list-string>: Tags separate by commas. Optionally use [<date>|+|-|] to specify tag folder date, [-] or [] for earliest creation date, [+] for latest when absent. Env variable taglite_date_override if existent overrides.");
             sb.AppendLine(" <list-of-files-or-dirs-to-tag>: A list of files and directories to be moved to a timestamp named tagged folder in <store-dir>.");
             sb.Append(" <folder-to-tag>: A folder of which the content is moved to a timestamp named tagged folder in <store-dir>.");
             return sb.ToString();
