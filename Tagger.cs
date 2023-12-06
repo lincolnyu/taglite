@@ -70,14 +70,19 @@ namespace Taglite
             }
         }
 
-        public static DateTime GetLatestDateTimeFromFiles(IList<string> fileNames)
+        private static DateTime GetEarliestFileTime(FileInfo fileInfo)
         {
-            return GetAllFilesIncludingInSubfolders(fileNames).Select(fn => fn.CreationTime).Max();
+            return (fileInfo.CreationTime < fileInfo.LastWriteTime)? fileInfo.CreationTime : fileInfo.LastWriteTime;
         }
 
-        public static DateTime GetEarliestDateTimeFromFiles(IList<string> fileNames)
+        private static DateTime GetLatestDateTimeFromFiles(IList<string> fileNames)
         {
-            return GetAllFilesIncludingInSubfolders(fileNames).Select(fn => fn.CreationTime).Min();
+            return GetAllFilesIncludingInSubfolders(fileNames).Select(fi => GetEarliestFileTime(fi)).Max();
+        }
+
+        private static DateTime GetEarliestDateTimeFromFiles(IList<string> fileNames)
+        {
+            return GetAllFilesIncludingInSubfolders(fileNames).Select(fi => GetEarliestFileTime(fi)).Min();
         }
 
         public static void ProcessArgs(string[] args)
