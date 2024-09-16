@@ -20,11 +20,12 @@ namespace Taglite
                 {
                     return null;
                 }
+                defaultTagStore = Path.GetFullPath(defaultTagStore!);
                 if (inputDir != null)
                 {
-                    return Path.Combine(defaultTagStore!, inputDir);
+                    return Path.Combine(defaultTagStore, inputDir);
                 }
-                return defaultTagStore!;
+                return defaultTagStore;
             }
         }
     }
