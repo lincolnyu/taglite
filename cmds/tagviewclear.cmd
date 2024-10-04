@@ -1,4 +1,4 @@
-rem @echo off
+@echo off
 if "%taglite_view%" == "" (
   echo "%%taglite_view%% not defined"
 ) else (
