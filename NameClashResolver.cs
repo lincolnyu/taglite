@@ -18,5 +18,10 @@ namespace Taglite
                 attempt = input + $"({++dupSuffix})";
             }
         }
+
+        internal void Unuse(string input)
+        {
+            _usedNames.Remove(input);
+        }
     }
 }

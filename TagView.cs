@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using System.Text;
 using Taglite.Core;
 using static Taglite.Util;
@@ -214,21 +215,53 @@ namespace Taglite
                         sb.Append(".");
                         sb.Append(tag);
                     }
-                    var name = clashResolver.New(sb.ToString());
+                    var name = sb.ToString();
                     switch (mode)
                     {
                         case 'l':
-                            CreateShortcut(Path.Combine(viewDir, name + ".lnk"), node.Directory);
+                            CreateShortcut(LimitFilePathLength(Path.Combine(viewDir, name + ".lnk"), clashResolver), node.Directory);
                             break;
                         case 's':
-                            CreateDirSymLink(Path.Combine(viewDir, name), node.Directory);
+                            CreateDirSymLink(LimitFilePathLength(Path.Combine(viewDir, name), clashResolver), node.Directory);
                             break;
                         case 'c':
-                            CreateCmdLink(Path.Combine(viewDir, name + ".cmd"), node.Directory);
+                            CreateCmdLink(LimitFilePathLength(Path.Combine(viewDir, name + ".cmd"), clashResolver), node.Directory);
                             break;
                     }
                 }
             }
+        }
+
+        private static string LimitFilePathLength(string inputFilePath, NameClashResolver clashResolver)
+        {
+            const int fileNameLengthLimit = 260;
+
+            var ext = Path.GetExtension(inputFilePath);
+            var dir =Path.GetDirectoryName(inputFilePath);
+            var fn = Path.GetFileNameWithoutExtension(inputFilePath);
+
+            var newFileName = fn;
+            newFileName = clashResolver.New(newFileName);
+            var fullPath = Path.Combine(dir, $"{newFileName}{ext}");
+            if (fullPath.Length < fileNameLengthLimit)
+            {
+                return fullPath;
+            }
+
+            var allowedFileNameLength = fileNameLengthLimit - ext.Length - dir.Length - 2;
+            for (var newFileNameLength = allowedFileNameLength; newFileNameLength > 0; newFileNameLength--)
+            {
+                clashResolver.Unuse(newFileName);
+                newFileName = fn[..newFileNameLength];
+                newFileName = clashResolver.New(newFileName);
+                fullPath = Path.Combine(dir, $"{newFileName}{ext}");
+                if (fullPath.Length < fileNameLengthLimit)
+                {
+                    return fullPath;
+                }
+            }
+
+            throw new ArgumentException($"Unable to create the required file {fn}{ext} at location {dir}.");
         }
 
         static void CreateShortcut(string source, string target)
