@@ -34,7 +34,15 @@ namespace Taglite.Core
         {
             foreach (var node in EnumerateAllTagNodes(directory))
             {
-                tagRepo.AddNode(node);
+                try
+                {
+                    tagRepo.AddNode(node);
+                }
+                catch (IOException)
+                {
+                    // TODO use logging...
+                    Console.WriteLine($"IOException occurred when reading tags from {directory.FullName}. Skipped.");
+                }
             }
         }
 
