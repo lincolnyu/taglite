@@ -1,4 +1,3 @@
 @echo off
-cd %~dp0
-cd ..
+cd /d "%~dp0.."
 dotnet run -- tag . %*
