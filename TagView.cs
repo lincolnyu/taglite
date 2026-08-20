@@ -242,13 +242,13 @@ namespace Taglite
 
             var newFileName = fn;
             newFileName = clashResolver.New(newFileName);
-            var fullPath = Path.Combine(dir, $"{newFileName}{ext}");
+            var fullPath = Path.Combine(dir!, $"{newFileName}{ext}");
             if (fullPath.Length < fileNameLengthLimit)
             {
                 return fullPath;
             }
 
-            var allowedFileNameLength = fileNameLengthLimit - ext.Length - dir.Length - 2;
+            var allowedFileNameLength = fileNameLengthLimit - ext.Length - dir!.Length - 2;
             for (var newFileNameLength = allowedFileNameLength; newFileNameLength > 0; newFileNameLength--)
             {
                 clashResolver.Unuse(newFileName);

@@ -186,12 +186,28 @@ namespace Taglite
                     if (File.Exists(item))
                     {
                         var file = new FileInfo(item);
-                        file.MoveTo(Path.Combine(subdirFullName, file.Name));
+                        var target = Path.Combine(subdirFullName, file.Name);
+                        try
+                        {
+                            file.MoveTo(target);
+                        }
+                        catch (IOException)
+                        {
+                            Console.WriteLine($"Unable to move {file.FullName}, copied.");
+                            file.CopyTo(target);
+                        }
                     }
                     else if (Directory.Exists(item))
                     {
                         var dir  = new DirectoryInfo(item);
-                        dir.MoveTo(Path.Combine(subdirFullName, dir.Name));
+                        try
+                        {
+                            dir.MoveTo(Path.Combine(subdirFullName, dir.Name));
+                        }
+                        catch (IOException)
+                        {
+                            Console.WriteLine($"Unable to move {dir.FullName}, left for manual operation.");
+                        }
                     }
                 }
             }
